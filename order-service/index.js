@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { connect, credsAuthenticator, StringCodec } = require('nats');
 const userCreatedSubscriber = require('./subscribers/userCreatedSubscriber');
 const Order = require('./models/order');
+const User = require('./models/user');
 require('dotenv').config();
 const {jwt, seed} = require('./config/natConfig');
 
@@ -34,8 +35,8 @@ const start = async () => {
     res.status(201).json(order);
   });
   
-  app.get('/users', (req, res) => {
-    const users = userCreatedSubscriber.getUsers();
+  app.get('/users', async (req, res) => {
+    const users = await User.find({});
     res.json(users);
   });
   
