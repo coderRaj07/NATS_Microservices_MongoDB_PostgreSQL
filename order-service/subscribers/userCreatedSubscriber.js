@@ -17,20 +17,29 @@ const { StringCodec } = require('nats');
 //     });
 //   };
 
-module.exports = function(nc) {
-  const sc = StringCodec();
-  const subscription = nc.subscribe('user.created');
-  (async () => {
-    for await (const msg of subscription) {
-      try {
-        const user = JSON.parse(sc.decode(msg.data));
-        console.log(`Received user created event: ${user.name} (${user.email})`);
-        // Handle the event (e.g., create a new order for the user)
-      } catch (error) {
-        console.error('Error processing user.created event', error);
-      }
-    }
-  })();
-};
+let users = {};
+
+module.exports = function (nc) {
+    const sc = StringCodec();
+    const subscription = nc.subscribe('user.created');
+    (async () => {
+        for await (const msg of subscription) {
+            try {
+                const user = JSON.parse(sc.decode(msg.data));
+                console.log(`Received user created event: ${user.name} (${user.email})`);
+                // Store the user data and export it to be used by the other router functions
+                users = {
+                    name: user.name,
+                    email: user.email
+                };
+                console.log('User data stored:', users);
+            } catch (error) {
+                console.error('Error processing user.created event', error);
+            }
+        }
+    })();
+}
+
+module.exports.getUsers = () => users;
 
 

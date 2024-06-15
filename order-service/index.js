@@ -8,8 +8,6 @@ const {jwt, seed} = require('./config/natConfig');
 
 const start = async () => {
   const app = express();
-
-
  
   // Connect to NATS with credentials
   const nc = await connect({
@@ -35,7 +33,12 @@ const start = async () => {
     await order.save();
     res.status(201).json(order);
   });
-
+  
+  app.get('/users', (req, res) => {
+    const users = userCreatedSubscriber.getUsers();
+    res.json(users);
+  });
+  
   // Start the Express server
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
